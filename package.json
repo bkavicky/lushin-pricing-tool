@@ -1,0 +1,13 @@
+{
+  "name": "lushin-pricing-tool",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lushin engagement pricing intake — emails a PDF summary to the coach and copies leadership.",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "pdf-lib": "^1.17.1",
+    "resend": "^4.0.0"
+  }
+}
