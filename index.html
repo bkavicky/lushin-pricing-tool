@@ -158,13 +158,13 @@ section{margin-bottom:40px;}
           <p class="sec-sub">What you plan to deliver across the year.</p>
           <hr class="sec-rule">
           <div class="grid">
-            <div class="field"><label>Learners</label><input id="learners" type="number" inputmode="numeric" min="1" max="200" placeholder="10"></div>
-            <div class="field"><label>Team sessions / year</label><input id="teamSessions" type="number" inputmode="numeric" min="0" max="48" placeholder="12"></div>
-            <div class="field"><label>Leader sessions / year</label><input id="leaderSessions" type="number" inputmode="numeric" min="0" max="24" placeholder="12"></div>
-            <div class="field"><label>…of which AOR-led</label><input id="aorLed" type="number" inputmode="numeric" min="0" max="48" placeholder="0"><div class="helper">Subset of team sessions.</div><div class="err" id="err-aorLed"></div></div>
-            <div class="field"><label>Leadership coaching sessions / year</label><input id="coachingSessions" type="number" inputmode="numeric" min="0" max="24" placeholder="0"></div>
-            <div class="field"><label>Travel hours / year</label><input id="travelHours" type="number" inputmode="numeric" min="0" max="80" placeholder="0"></div>
-            <div class="field"><label>Travel rate ($/hr)</label><input id="travelRate" type="number" inputmode="numeric" min="0" step="50" placeholder="500"><div class="helper">Dollars per travel hour.</div></div>
+            <div class="field"><label>Learners</label><input id="learners" type="number" inputmode="numeric" min="1" max="200"><div class="err" id="err-learners"></div></div>
+            <div class="field"><label>Team sessions / year</label><input id="teamSessions" type="number" inputmode="numeric" min="0" max="48"><div class="err" id="err-teamSessions"></div></div>
+            <div class="field"><label>Leader sessions / year</label><input id="leaderSessions" type="number" inputmode="numeric" min="0" max="24"><div class="err" id="err-leaderSessions"></div></div>
+            <div class="field"><label>…of which AOR-led</label><input id="aorLed" type="number" inputmode="numeric" min="0" max="48"><div class="helper">Subset of team sessions.</div><div class="err" id="err-aorLed"></div></div>
+            <div class="field"><label>Leadership coaching sessions / year</label><input id="coachingSessions" type="number" inputmode="numeric" min="0" max="24"><div class="err" id="err-coachingSessions"></div></div>
+            <div class="field"><label>Travel hours / year</label><input id="travelHours" type="number" inputmode="numeric" min="0" max="80"><div class="err" id="err-travelHours"></div></div>
+            <div class="field"><label>Travel rate ($/hr)</label><input id="travelRate" type="number" inputmode="numeric" min="0" step="50"><div class="helper">Dollars per travel hour.</div><div class="err" id="err-travelRate"></div></div>
           </div>
         </section>
 
@@ -174,8 +174,8 @@ section{margin-bottom:40px;}
           <p class="sec-sub">Experience of the Associate of Record and trainer on this engagement.</p>
           <hr class="sec-rule">
           <div class="grid">
-            <div class="field"><label>Associate of Record experience (years)</label><input id="aorExp" type="number" inputmode="numeric" min="1" max="20" placeholder="10"></div>
-            <div class="field"><label>Trainer experience (years)</label><input id="trainerExp" type="number" inputmode="numeric" min="1" max="20" placeholder="2"></div>
+            <div class="field"><label>Associate of Record experience (years)</label><input id="aorExp" type="number" inputmode="numeric" min="1" max="20"><div class="err" id="err-aorExp"></div></div>
+            <div class="field"><label>Trainer experience (years)</label><input id="trainerExp" type="number" inputmode="numeric" min="1" max="20"><div class="err" id="err-trainerExp"></div></div>
           </div>
         </section>
 
@@ -188,11 +188,11 @@ section{margin-bottom:40px;}
           <p class="sec-sub">Fill this out to make sure we are pricing the value appropriately.</p>
           <hr class="sec-rule thin">
           <div class="grid">
-            <div class="field"><label>Annual revenue</label><input id="annualRevenue" type="number" inputmode="numeric" min="0" step="100000" placeholder="0"></div>
-            <div class="field"><label>Gross profit margin %</label><input id="gpMargin" type="number" inputmode="numeric" min="0" max="100" placeholder="0"></div>
-            <div class="field"><label>Dollarized impact of problems / year</label><input id="dollarImpact" type="number" inputmode="numeric" min="0" step="50000" placeholder="0"></div>
-            <div class="field"><label>Avg client lifetime value</label><input id="clv" type="number" inputmode="numeric" min="0" step="10000" placeholder="0"></div>
-            <div class="field"><label>Avg sales cycle (months)</label><input id="salesCycle" type="number" inputmode="numeric" min="0" placeholder="6"></div>
+            <div class="field"><label>Annual revenue</label><input id="annualRevenue" type="number" inputmode="numeric" min="0" step="100000"><div class="err" id="err-annualRevenue"></div></div>
+            <div class="field"><label>Gross profit margin %</label><input id="gpMargin" type="number" inputmode="numeric" min="0" max="100"><div class="err" id="err-gpMargin"></div></div>
+            <div class="field"><label>Dollarized impact of problems / year</label><input id="dollarImpact" type="number" inputmode="numeric" min="0" step="50000"><div class="err" id="err-dollarImpact"></div></div>
+            <div class="field"><label>Avg client lifetime value</label><input id="clv" type="number" inputmode="numeric" min="0" step="10000"><div class="err" id="err-clv"></div></div>
+            <div class="field"><label>Avg sales cycle (months)</label><input id="salesCycle" type="number" inputmode="numeric" min="0"><div class="err" id="err-salesCycle"></div></div>
           </div>
         </section>
 
@@ -205,8 +205,8 @@ section{margin-bottom:40px;}
           <p class="sec-sub">Only if a SEIA or assessments are part of this engagement.</p>
           <hr class="sec-rule thin">
           <div class="grid">
-            <div class="field"><label>Number of overviews</label><input id="overviews" type="number" inputmode="numeric" min="0" placeholder="0"></div>
-            <div class="field"><label>Number of participants</label><input id="participants" type="number" inputmode="numeric" min="0" placeholder="0"></div>
+            <div class="field"><label>Number of overviews</label><input id="overviews" type="number" inputmode="numeric" min="0"><div class="err" id="err-overviews"></div></div>
+            <div class="field"><label>Number of participants</label><input id="participants" type="number" inputmode="numeric" min="0"><div class="err" id="err-participants"></div></div>
           </div>
         </section>
 
@@ -245,12 +245,38 @@ section{margin-bottom:40px;}
     yourEmail: 'Enter your email.'
   };
 
+  // Number rules. Blank is never filled in for the coach: a required field must be
+  // typed in (0 is an answer). The same rules are enforced again on the server.
+  // zeroable = 0 is a valid answer, so the error tells the coach to type 0 if none.
+  var NUM = [
+    { id:'learners',         min:1, max:200, int:true, need:function(){ return true; } },
+    { id:'teamSessions',     min:0, max:48,  int:true, zeroable:true },
+    { id:'leaderSessions',   min:0, max:24,  int:true, zeroable:true },
+    { id:'aorLed',           min:0, max:48,  int:true, zeroable:true },
+    { id:'coachingSessions', min:0, max:24,  int:true, zeroable:true },
+    { id:'travelHours',      min:0, max:80,  int:true, zeroable:true },
+    { id:'travelRate',       min:0, max:null,int:true, need:function(){ return num('travelHours') > 0; }, needMsg:'Required when there are travel hours.' },
+    { id:'aorExp',           min:1, max:20,  int:true, need:function(){ return true; } },
+    { id:'trainerExp',       min:1, max:20,  int:true, need:function(){ return num('teamSessions') - num('aorLed') > 0; }, needMsg:'Required when there are trainer-led team sessions.' },
+    // optional sections: blank is fine, but anything typed must make sense
+    { id:'annualRevenue', min:0, max:null }, { id:'gpMargin', min:0, max:100 },
+    { id:'dollarImpact',  min:0, max:null }, { id:'clv', min:0, max:null },
+    { id:'salesCycle',    min:0, max:null },
+    { id:'overviews',     min:0, max:null, int:true }, { id:'participants', min:0, max:null, int:true }
+  ];
+  NUM.forEach(function(r){
+    if (!r.need) r.need = function(){ return !!r.zeroable; };
+  });
+
+  function raw(id){ return $(id).value.trim(); }
+  function num(id){ var v = raw(id); return v === '' ? 0 : Number(v); }
+
   function clearFieldError(id){
     var input = $(id), err = $('err-' + id);
     if (input) input.classList.remove('invalid');
     if (err){ err.style.display = 'none'; err.textContent = ''; }
   }
-  ['dealName','company','yourName','yourEmail','aorLed'].forEach(function(id){
+  Object.keys(REQUIRED).concat(NUM.map(function(r){ return r.id; })).forEach(function(id){
     var el = $(id); if (el) el.addEventListener('input', function(){ clearFieldError(id); genErr.classList.remove('show'); });
   });
 
@@ -262,28 +288,39 @@ section{margin-bottom:40px;}
 
   function validate(){
     var firstBad = null;
-    Object.keys(REQUIRED).forEach(function(id){ clearFieldError(id); });
-    clearFieldError('aorLed');
+    function bad(id, msg){ showFieldError(id, msg); firstBad = firstBad || id; }
+    Object.keys(REQUIRED).forEach(clearFieldError);
+    NUM.forEach(function(r){ clearFieldError(r.id); });
 
-    Object.keys(REQUIRED).forEach(function(id){
-      if (!$(id).value.trim()){ showFieldError(id, REQUIRED[id]); firstBad = firstBad || id; }
+    Object.keys(REQUIRED).forEach(function(id){ if (!raw(id)) bad(id, REQUIRED[id]); });
+    var email = raw('yourEmail');
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) bad('yourEmail', 'Enter a valid email address.');
+
+    NUM.forEach(function(r){
+      var v = raw(r.id);
+      if (v === ''){
+        if (r.need()) bad(r.id, r.needMsg || (r.zeroable ? 'Required. Type 0 if none.' : 'Required.'));
+        return;
+      }
+      var n = Number(v);
+      if (!isFinite(n)) return bad(r.id, 'Enter a number.');
+      if (r.int && Math.floor(n) !== n) return bad(r.id, 'Whole numbers only.');
+      if (n < r.min || (r.max != null && n > r.max))
+        return bad(r.id, r.max != null ? 'Must be between ' + r.min + ' and ' + r.max + '.' : 'Can’t be below ' + r.min + '.');
     });
-    var email = $('yourEmail').value.trim();
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-      showFieldError('yourEmail', 'Enter a valid email address.'); firstBad = firstBad || 'yourEmail';
-    }
-    var team = Number($('teamSessions').value || 0), aor = Number($('aorLed').value || 0);
-    if (aor > team){ showFieldError('aorLed', 'Can’t exceed team sessions.'); firstBad = firstBad || 'aorLed'; }
+    if (raw('aorLed') !== '' && num('aorLed') > num('teamSessions') && !$('aorLed').classList.contains('invalid'))
+      bad('aorLed', 'Can’t exceed team sessions.');
 
     if (firstBad){
-      scroll.scrollTo({ top: 0, behavior: 'smooth' });
-      var el = $(firstBad); if (el) el.focus();
+      var el = $(firstBad);
+      if (el){ el.scrollIntoView({ behavior:'smooth', block:'center' }); el.focus({ preventScroll:true }); }
       return false;
     }
     return true;
   }
 
-  function val(id){ return $(id).value.trim(); }
+  // Sends exactly what was typed, blanks included. The server re-checks everything.
+  function val(id){ return raw(id); }
 
   function payload(){
     return {
@@ -296,15 +333,15 @@ section{margin-bottom:40px;}
         submittedAt: new Date().toISOString()
       },
       engagement: {
-        learners: val('learners') || 10,
-        teamSessions: val('teamSessions') || 0,
-        aorTeamSessions: val('aorLed') || 0,
-        leaderSessions: val('leaderSessions') || 0,
-        coachingSessions: val('coachingSessions') || 0,
-        trainerYears: val('trainerExp') || 1,
-        aorYears: val('aorExp') || 1,
-        travelHours: val('travelHours') || 0,
-        travelRate: val('travelRate') || 0
+        learners: val('learners'),
+        teamSessions: val('teamSessions'),
+        aorTeamSessions: val('aorLed'),
+        leaderSessions: val('leaderSessions'),
+        coachingSessions: val('coachingSessions'),
+        trainerYears: val('trainerExp'),
+        aorYears: val('aorExp'),
+        travelHours: val('travelHours'),
+        travelRate: val('travelRate')
       },
       prospect: {
         revenue: val('annualRevenue'),
@@ -335,13 +372,15 @@ section{margin-bottom:40px;}
         body: JSON.stringify(payload())
       });
       var data = await res.json().catch(function(){ return {}; });
-      if (!res.ok || !data.ok){ throw new Error(data.error || 'send failed'); }
+      if (!res.ok || !data.ok){ var err = new Error(data.error || 'send failed'); err.server = data.error; throw err; }
       $('confirm-msg').innerHTML = 'Your summary for <strong>' + escapeHtml(val('dealName')) +
         '</strong> is on its way to <strong>' + escapeHtml(val('yourEmail')) + '</strong>.';
       $('form-wrap').style.display = 'none';
       $('confirm').classList.add('show');
       scroll.scrollTo({ top: 0 });
     } catch (e) {
+      $('gen-err-msg').innerHTML = e && e.server ? escapeHtml(e.server) :
+        'Something went wrong on send. Press <strong>Try again</strong> — nothing you entered was lost.';
       setBusy(false);
       genErr.classList.add('show');
       submitLabel.textContent = 'Try again';

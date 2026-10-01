@@ -9,7 +9,7 @@
 // ---------------------------------------------------------------------------
 
 const { Resend } = require('resend');
-const { computeAll, money } = require('../lib/pricing');
+const { computeAll, validateInputs, money } = require('../lib/pricing');
 const { buildPdf } = require('../lib/pdf');
 
 function readBody(req) {
@@ -64,6 +64,13 @@ module.exports = async function handler(req, res) {
   if (!clientName) errs.push('the prospect / client name');
   if (errs.length) {
     res.status(400).json({ ok: false, error: 'Please provide ' + errs.join(', ') + '.' });
+    return;
+  }
+
+  // Numbers are checked here too; nothing is filled in or adjusted.
+  const inputErrs = validateInputs(body);
+  if (inputErrs.length) {
+    res.status(400).json({ ok: false, error: 'Please fix: ' + inputErrs.join('; ') + '.' });
     return;
   }
 
