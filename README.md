@@ -1,7 +1,9 @@
 # Lushin Engagement Pricing Tool
 
 A hosted web app that lets a coach enter engagement details and **emails a
-branded PDF pricing summary to the coach and the leadership team**. No pricing
+branded PDF pricing summary to the coach and the leadership team**. Coaches
+sign in with Microsoft 365 and must pick or create a HubSpot deal first; the
+PDF is filed on that deal. See **HUBSPOT-SETUP.md**. No pricing
 is shown on screen — the coach fills in the inputs, hits **Send**, and sees only
 a "Check your email" confirmation. Every submission notifies leadership so you
 know when a coach is pricing something and can have the conversation.
@@ -22,7 +24,11 @@ know when a coach is pricing something and can have the conversation.
 ```
 public/index.html      Coach-facing intake (rebuilt from the Claude Design export; no math shown)
 public/assets/         Bundled Poppins fonts + Lushin logo used by the page
-api/submit.js          Serverless endpoint: validate → compute → PDF → email → log
+api/submit.js          Serverless endpoint: sign-in → deal → compute → PDF → file in HubSpot → email → log
+api/auth/*.js          Microsoft 365 sign-in (login, callback, logout)
+api/me.js, deals.js, companies.js   Signed-in coach, HubSpot deal and company search
+lib/hubspot.js         HubSpot client; pipelines and Qualified required fields
+lib/auth.js            Sign-in flow and signed session cookie
 lib/pricing.js         Authoritative pricing engine (rates, tiers, greater-of base)
 lib/pdf.js             Branded PDF report generator
 .env.example           The environment variables you must set
@@ -32,7 +38,8 @@ vercel.json            Vercel config
 Pricing logic (in `lib/pricing.js`): the engagement base is the **greater of**
 the hourly floor or the per-learner fee (not summed); per-learner tiers are
 $184 / $120 / $98 / $88 / $80 by cohort size, with a flat $2,250/learner/year at
-100+ learners; then Yoodli/materials at $500/learner and a 5% Sandler online
+100+ learners; then optional Yoodli/materials at $500/learner (the coach
+chooses) and a 5% Sandler online
 add-on.
 
 ## What you need to provide
@@ -46,6 +53,11 @@ Environment Variables). See `.env.example`.
 | `FROM_EMAIL` | Sending address, e.g. `Lushin Pricing <pricing@lushin.com>`. The domain must be verified in Resend. |
 | `LEADERSHIP_EMAILS` | The four leaders, comma-separated. CC'd on every submission. |
 | `LOG_WEBHOOK_URL` | *(optional)* A webhook (e.g. Zapier/Make → Google Sheet) to log each submission. Leave blank to skip. |
+| `HUBSPOT_TOKEN` | HubSpot private app token. See HUBSPOT-SETUP.md. |
+| `MS_TENANT_ID`, `MS_CLIENT_ID`, `MS_CLIENT_SECRET` | Microsoft Entra app registration for sign-in. See HUBSPOT-SETUP.md. |
+| `SESSION_SECRET` | Long random string that signs the login cookie. |
+| `APP_URL` | *(production)* `https://pricing.lushin.com` |
+| `ALLOWED_EMAIL_DOMAINS` | *(optional)* Defaults to `lushin.com`. |
 
 **Still needed from you:** the four leadership email addresses, the sending
 address (and which domain to verify in Resend), and who owns the Vercel +

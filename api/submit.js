@@ -1,16 +1,21 @@
 // ---------------------------------------------------------------------------
 // POST /api/submit  — Vercel serverless function
 // ---------------------------------------------------------------------------
-// 1. Validates the coach's submission
-// 2. Recomputes ALL pricing server-side (browser never sees the math)
-// 3. Generates a branded PDF report
-// 4. Emails it to the coach, CC'ing leadership (CC enforced here, server-side)
-// 5. Logs the submission (console + optional webhook)
+// 1. Requires a signed-in coach (Microsoft 365) — name and email come from there
+// 2. Validates the submission, including the HubSpot deal it's for
+// 3. Creates the deal in HubSpot first if the coach asked for a new one
+// 4. Recomputes ALL pricing server-side (browser never sees the math)
+// 5. Generates a branded PDF report
+// 6. Files the PDF on the deal as a note and updates the deal's existing fields
+// 7. Emails it to the coach, CC'ing leadership (CC enforced here, server-side)
+// 8. Logs the submission (console + optional webhook)
 // ---------------------------------------------------------------------------
 
 const { Resend } = require('resend');
 const { computeAll, validateInputs, money } = require('../lib/pricing');
 const { buildPdf } = require('../lib/pdf');
+const { getUser } = require('../lib/auth');
+const hubspot = require('../lib/hubspot');
 
 function readBody(req) {
   if (req.body && typeof req.body === 'object') return Promise.resolve(req.body);
@@ -38,11 +43,17 @@ module.exports = async function handler(req, res) {
   const leadership = (process.env.LEADERSHIP_EMAILS || '')   // comma-separated, set in Vercel
     .split(',').map(s => s.trim()).filter(Boolean);
 
-  if (!apiKey || !fromEmail || leadership.length === 0) {
+  if (!apiKey || !fromEmail || leadership.length === 0 || !hubspot.configured()) {
     console.error('[submit] Missing env config', {
-      hasKey: !!apiKey, hasFrom: !!fromEmail, leadershipCount: leadership.length,
+      hasKey: !!apiKey, hasFrom: !!fromEmail, leadershipCount: leadership.length, hasHubSpot: hubspot.configured(),
     });
     res.status(500).json({ ok: false, error: 'Server is not fully configured yet. Contact leadership.' });
+    return;
+  }
+
+  const user = getUser(req);
+  if (!user) {
+    res.status(401).json({ ok: false, error: 'Your sign-in has expired. Sign in again — nothing you entered was lost.' });
     return;
   }
 
@@ -51,20 +62,25 @@ module.exports = async function handler(req, res) {
   catch { res.status(400).json({ ok: false, error: 'Could not read submission.' }); return; }
 
   const meta = body.meta || {};
-  const dealName = String(meta.dealName || '').trim();
-  const coachName = String(meta.coachName || '').trim();
-  const coachEmail = String(meta.coachEmail || '').trim();
-  const clientName = String(meta.clientName || '').trim();
+  const coachName = user.name;
+  const coachEmail = user.email;
+  const pick = body.deal || {};
+  const create = pick.create || null;
 
   // ---- validation ----
-  const errs = [];
-  if (!dealName) errs.push('a deal name');
-  if (!coachName) errs.push('your name');
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(coachEmail)) errs.push('a valid email');
-  if (!clientName) errs.push('the prospect / client name');
-  if (errs.length) {
-    res.status(400).json({ ok: false, error: 'Please provide ' + errs.join(', ') + '.' });
+  if (!pick.id && !create) {
+    res.status(400).json({ ok: false, error: 'Choose a HubSpot deal, or create one, before sending.' });
     return;
+  }
+  if (create) {
+    const errs = [];
+    if (!hubspot.PIPELINES[create.pipeline]) errs.push('a pipeline');
+    if (!String(create.name || '').trim()) errs.push('a deal name');
+    if (!create.companyId && !String(create.companyName || '').trim()) errs.push('the prospect / client company');
+    if (errs.length) {
+      res.status(400).json({ ok: false, error: 'To create the deal, provide ' + errs.join(', ') + '.' });
+      return;
+    }
   }
 
   // Numbers are checked here too; nothing is filled in or adjusted.
@@ -73,6 +89,47 @@ module.exports = async function handler(req, res) {
     res.status(400).json({ ok: false, error: 'Please fix: ' + inputErrs.join('; ') + '.' });
     return;
   }
+
+  // ---- HubSpot deal (must exist before anything is sent) ----
+  let ownerId = null;
+  let deal;
+  let created = false;
+  try {
+    ownerId = await hubspot.findOwnerIdByEmail(coachEmail);
+    if (create) {
+      const companyId = create.companyId
+        ? String(create.companyId)
+        : await hubspot.createCompany(String(create.companyName).trim().slice(0, 200));
+      const id = await hubspot.createDeal({
+        name: String(create.name).trim().slice(0, 200),
+        pipelineKey: create.pipeline,
+        ownerId,
+        companyId,
+      });
+      created = true;
+      deal = await hubspot.getDeal(id);
+    } else {
+      deal = await hubspot.getDeal(String(pick.id));
+      if (!deal.pipeline || deal.closed) {
+        res.status(400).json({ ok: false, error: 'That deal is closed or not in the Retainer or Assessments/SEIA pipeline. Choose another.' });
+        return;
+      }
+    }
+  } catch (e) {
+    console.error('[submit] HubSpot deal step failed', e.message);
+    res.status(502).json({ ok: false, error: 'Could not reach HubSpot, so nothing was sent. Try again in a minute.' });
+    return;
+  }
+
+  const dealName = deal.name;
+  const clientName = (deal.company && deal.company.name) || String((create && create.companyName) || '').trim();
+  const pipeline = hubspot.PIPELINES[deal.pipeline];
+  const missing = hubspot.missingQualifiedFields(deal.pipeline, deal.properties);
+  const preQualified = hubspot.PRE_QUALIFIED_STAGES.has(deal.stage);
+  const dealOut = {
+    id: deal.id, name: dealName, url: deal.url, created,
+    pipelineLabel: pipeline.label, stageLabel: deal.stageLabel,
+  };
 
   // ---- compute (authoritative) ----
   const computed = computeAll(body);
@@ -94,16 +151,34 @@ module.exports = async function handler(req, res) {
     pdfBytes = await buildPdf(reportData);
   } catch (e) {
     console.error('[submit] PDF generation failed', e);
-    res.status(500).json({ ok: false, error: 'Could not build the report PDF.' });
+    res.status(500).json({ ok: false, error: 'Could not build the report PDF.', deal: dealOut });
     return;
   }
   const filename = `Lushin-Pricing-${safeName(dealName || clientName)}.pdf`;
 
-  // ---- email ----
+  // ---- file on the HubSpot deal (a failure here doesn't stop the email) ----
   const total = money(computed.engagement.total);
+  let filed = true;
+  try {
+    const attachmentId = await hubspot.uploadPdf(pdfBytes, filename);
+    await hubspot.createNote({
+      dealId: deal.id,
+      companyId: deal.company && deal.company.id,
+      ownerId,
+      attachmentId,
+      html: noteHtml({ coachName, total, computed, notes: reportData.meta.notes, missing, preQualified }),
+    });
+    await hubspot.updateDeal(deal.id, dealFields(deal.pipeline, computed));
+  } catch (e) {
+    filed = false;
+    console.error('[submit] HubSpot filing failed', e.message);
+  }
+
+  // ---- email ----
   const subject = `Pricing summary — ${dealName} (${coachName})`;
   const html = `
     <div style="font-family:Arial,Helvetica,sans-serif;color:#21245C;font-size:14px;line-height:1.5;">
+      ${hubspotBlock({ deal: dealOut, missing, preQualified, filed })}
       <p><strong>${escapeHtml(coachName)}</strong> just ran pricing for <strong>${escapeHtml(dealName)}</strong>${clientName ? ` (${escapeHtml(clientName)})` : ''}.</p>
       <p style="font-size:15px;">Annual engagement price: <strong>${total}</strong>
          ${computed.omg.total > 0 ? ` &nbsp;·&nbsp; OMG: <strong>${money(computed.omg.total)}</strong>` : ''}</p>
@@ -128,16 +203,78 @@ module.exports = async function handler(req, res) {
     if (error) throw new Error(error.message || 'Email provider error');
 
     // ---- log ----
-    logSubmission(reportData, computed, data && data.id);
+    logSubmission(reportData, computed, data && data.id, { deal: dealOut, filed, missing });
 
-    res.status(200).json({ ok: true, id: data && data.id });
+    res.status(200).json({ ok: true, id: data && data.id, deal: dealOut, missing, preQualified, filed });
   } catch (e) {
     console.error('[submit] Email send failed', e);
-    res.status(502).json({ ok: false, error: 'The report was built but the email failed to send.' });
+    // The deal exists now; the page retries against it rather than creating another.
+    res.status(502).json({ ok: false, error: 'The report was built but the email failed to send.', deal: dealOut });
   }
 };
 
-function logSubmission(reportData, computed, emailId) {
+// Existing HubSpot deal fields the pricing fills in. No custom fields.
+// Amount depends on the pipeline: Retainer deals get the engagement price
+// (with the Sandler fee, and Yoodli only if the coach included it);
+// Assessments/SEIA deals get the OMG/SEIA total, and only when there is one.
+function dealFields(pipelineKey, computed) {
+  const props = {};
+  if (pipelineKey === 'retainer') {
+    props.amount = String(Math.round(computed.engagement.total));
+    props.retainer_ = String(Math.round(computed.engagement.total / 12));
+  } else if (pipelineKey === 'seia' && computed.omg.total > 0) {
+    props.amount = String(Math.round(computed.omg.total));
+  }
+  const g = computed.gutCheck.inputs;
+  if (g.revenue > 0) props.company_revenue = String(Math.round(g.revenue));
+  if (g.impact > 0) props.pain_quantified = money(g.impact);
+  return props;
+}
+
+function missingLine(missing) {
+  return missing.map(escapeHtml).join(', ');
+}
+
+function noteHtml({ coachName, total, computed, notes, missing, preQualified }) {
+  return [
+    `<p><strong>Pricing summary</strong> run by ${escapeHtml(coachName)} in the Lushin pricing tool.</p>`,
+    `<p>Annual engagement price: <strong>${total}</strong>`,
+    computed.omg.total > 0 ? ` · OMG: <strong>${money(computed.omg.total)}</strong>` : '',
+    ` · Learners: ${computed.engagement.inputs.learners}</p>`,
+    notes ? `<p><em>Notes:</em> ${escapeHtml(notes)}</p>` : '',
+    preQualified ? '<p><strong>This deal is not yet in Qualified.</strong></p>' : '',
+    missing.length ? `<p><strong>Still blank for Qualified:</strong> ${missingLine(missing)}</p>` : '',
+    '<p>Full breakdown attached.</p>',
+  ].join('');
+}
+
+// Top-of-email box: the coach's reminder, which leadership sees too.
+function hubspotBlock({ deal, missing, preQualified, filed }) {
+  const link = `<a href="${deal.url}" style="color:#0045C2;font-weight:bold;">Open the deal in HubSpot →</a>`;
+  const lines = [];
+  if (deal.created) {
+    lines.push(`<strong>A new deal was created in HubSpot:</strong> ${escapeHtml(deal.name)} — ${escapeHtml(deal.pipelineLabel)} pipeline, ${escapeHtml(deal.stageLabel || 'Qualified')}.`);
+  }
+  if (preQualified) {
+    lines.push(`<strong>This deal is still in ${escapeHtml(deal.stageLabel || 'an early stage')}</strong>, not Qualified.`);
+  }
+  if (missing.length) {
+    lines.push(`<strong>Please finish the qualification details in HubSpot.</strong> Still blank: ${missingLine(missing)}.`);
+  }
+  if (!filed) {
+    lines.push('<strong>The report could not be attached to the HubSpot deal.</strong> Please add the PDF to the deal by hand.');
+  }
+  if (!lines.length) {
+    return `<p style="font-size:13px;color:#666;">Filed on the HubSpot deal <a href="${deal.url}" style="color:#0045C2;">${escapeHtml(deal.name)}</a>.</p>`;
+  }
+  return `
+    <div style="background:#FFF6E5;border-left:4px solid #E34554;padding:12px 16px;margin:0 0 18px;">
+      ${lines.map(l => `<p style="margin:0 0 8px;">${l}</p>`).join('')}
+      <p style="margin:0;">${link}</p>
+    </div>`;
+}
+
+function logSubmission(reportData, computed, emailId, hs) {
   const record = {
     at: reportData.meta.submittedAt,
     deal: reportData.meta.dealName,
@@ -148,6 +285,10 @@ function logSubmission(reportData, computed, emailId) {
     omgTotal: computed.omg.total,
     learners: computed.engagement.inputs.learners,
     emailId: emailId || null,
+    hubspotDealId: hs.deal.id,
+    hubspotDealCreated: hs.deal.created,
+    hubspotFiled: hs.filed,
+    qualifiedFieldsMissing: hs.missing.length,
   };
   // Always land in Vercel logs:
   console.log('[submit] SENT', JSON.stringify(record));

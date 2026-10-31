@@ -69,6 +69,9 @@ section{margin-bottom:40px;}
 .field input.invalid{border-color:var(--passionate);}
 .field .helper{font-size:12px;color:var(--text-muted);margin-top:6px;line-height:1.35;}
 .field .err{font-size:12px;color:var(--passionate);margin-top:6px;display:none;}
+.choice{display:flex;gap:24px;padding:4px 0;}
+.choice label{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:400;color:var(--stable);margin:0;cursor:pointer;}
+.choice input{width:18px;height:18px;margin:0;accent-color:var(--fresh);}
 
 .actions{border-top:1px solid var(--border-subtle);padding-top:24px;display:flex;justify-content:flex-end;}
 .btn{font-family:var(--font);font-weight:600;border-radius:var(--radius-pill);cursor:pointer;transition:filter var(--dur) var(--ease),background var(--dur) var(--ease);display:inline-flex;align-items:center;justify-content:center;gap:10px;}
@@ -88,6 +91,50 @@ section{margin-bottom:40px;}
 .confirm p{margin:0 auto 32px;font-size:16px;color:var(--text-body);line-height:1.5;}
 .confirm strong{font-weight:600;color:var(--stable);}
 
+/* signed-in coach + HubSpot deal picker (rail) */
+.rail .who{margin-top:10px;font-size:12px;color:rgba(255,255,255,0.72);}
+.rail .who a{color:#fff;}
+.rail-link{background:none;border:none;padding:0;margin-top:10px;font-family:var(--font);font-size:13px;font-weight:500;color:#fff;text-decoration:underline;text-underline-offset:3px;cursor:pointer;text-align:left;}
+.rail-note{font-size:12px;color:rgba(255,255,255,0.72);line-height:1.45;margin:8px 0 0;}
+.rail .sub-label{margin-top:16px;}
+.picker{position:relative;}
+.dd{position:absolute;left:0;right:0;top:100%;margin-top:6px;background:#fff;color:var(--stable);border-radius:var(--radius-md);box-shadow:0 10px 30px rgba(0,0,0,0.25);max-height:320px;overflow-y:auto;z-index:20;}
+.dd .opt{display:block;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--gray);padding:10px 12px;font-family:var(--font);cursor:pointer;color:var(--stable);}
+.dd .opt:hover,.dd .opt:focus{background:color-mix(in srgb, var(--fresh) 10%, #fff);outline:none;}
+.dd .opt .n{font-size:14px;font-weight:600;}
+.dd .opt .m{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.dd .hint{padding:10px 12px;font-size:12px;color:var(--text-muted);}
+.deal-card{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);border-radius:var(--radius-md);padding:12px 14px;margin-top:6px;}
+.deal-card .dc-name{font-size:18px;font-weight:600;line-height:1.3;}
+.deal-card .dc-meta{font-size:12px;color:rgba(255,255,255,0.78);margin-top:4px;line-height:1.45;}
+.deal-card .rail-link{font-size:12px;margin-top:8px;}
+.seg{display:flex;gap:8px;margin-top:4px;}
+.seg button{flex:1;font-family:var(--font);font-size:13px;font-weight:500;padding:8px 6px;border-radius:var(--radius-pill);border:1px solid rgba(255,255,255,0.45);background:transparent;color:#fff;cursor:pointer;}
+.seg button.on{background:#fff;color:var(--stable);border-color:#fff;}
+.dupes{background:rgba(255,255,255,0.1);border-radius:var(--radius-md);padding:10px 12px;margin-top:10px;font-size:12px;line-height:1.45;}
+.dupes .rail-link{display:block;font-size:12px;margin-top:6px;}
+
+/* pricing form waits for a deal */
+.lock-hint{display:none;background:color-mix(in srgb, var(--fresh) 10%, #fff);border-left:4px solid var(--fresh);border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:28px;font-size:14px;color:var(--stable);}
+.form.locked .lock-hint{display:block;}
+.form.locked .form-body{opacity:0.45;pointer-events:none;}
+
+/* HubSpot reminder on the confirmation screen */
+.hs-remind{text-align:left;background:#FFF6E5;border-left:4px solid var(--passionate);border-radius:var(--radius-sm);padding:16px 18px;margin:0 0 28px;font-size:14px;line-height:1.5;color:var(--text-body);}
+.hs-remind p{margin:0 0 8px;font-size:14px;}
+.hs-remind a{color:var(--energetic);font-weight:600;}
+.hs-filed{font-size:13px;color:var(--text-muted);margin:-16px 0 28px;}
+.hs-filed a{color:var(--energetic);}
+
+/* sign-in gate */
+.gate{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:24px 16px;background:radial-gradient(circle at 30% 18%, #00ADED 0%, #21245C 76%);color:#fff;}
+.gate.show{display:flex;}
+.gate .inner{max-width:420px;text-align:center;}
+.gate h1{font-size:28px;font-weight:600;margin:24px 0 10px;letter-spacing:-0.01em;}
+.gate p{font-size:15px;line-height:1.5;color:rgba(255,255,255,0.85);margin:0 0 28px;}
+.gate .btn-primary{text-decoration:none;background:#fff;color:var(--stable);}
+.gate .gate-err{color:#FFB4BC;font-size:14px;margin:0 0 20px;display:none;}
+
 @media (max-width:900px){
   .app{grid-template-columns:1fr;}
   .rail{padding:22px 22px 24px;overflow:visible;}
@@ -103,28 +150,48 @@ section{margin-bottom:40px;}
   <!-- IDENTITY RAIL -->
   <aside class="rail">
     <div class="eyebrow">Engagement pricing request</div>
+    <div class="who" id="who"></div>
     <div style="margin-top:24px;">
-      <label>Deal name<span class="req">*</span></label>
-      <input class="rail-in deal" id="dealName" placeholder="Name this deal" autocomplete="off">
-      <div class="rail-err" id="err-dealName"></div>
+      <label>HubSpot deal<span class="req">*</span></label>
+
+      <!-- chosen existing deal -->
+      <div class="deal-card" id="dealCard" hidden>
+        <div class="dc-name" id="dcName"></div>
+        <div class="dc-meta" id="dcMeta"></div>
+        <button type="button" class="rail-link" id="dcChange">Choose a different deal</button>
+      </div>
+
+      <!-- find an existing deal -->
+      <div id="dealPicker">
+        <div class="picker">
+          <input class="rail-in deal" id="dealSearch" placeholder="Find your deal" autocomplete="off">
+          <div class="dd" id="dealResults" hidden></div>
+        </div>
+        <button type="button" class="rail-link" id="newDealBtn">+ Not in HubSpot yet? Create the deal</button>
+      </div>
+
+      <!-- create a new deal -->
+      <div id="newDeal" hidden>
+        <label class="sub-label">Prospect / client company<span class="req">*</span></label>
+        <div class="picker">
+          <input class="rail-in" id="companySearch" placeholder="Search HubSpot companies" autocomplete="off">
+          <div class="dd" id="companyResults" hidden></div>
+        </div>
+        <div class="dupes" id="dupes" hidden></div>
+        <label class="sub-label">Pipeline<span class="req">*</span></label>
+        <div class="seg" id="pipelineSeg">
+          <button type="button" data-p="retainer">Retainer</button>
+          <button type="button" data-p="seia">Assessments/SEIA</button>
+        </div>
+        <label class="sub-label">Deal name<span class="req">*</span></label>
+        <input class="rail-in" id="newDealName" autocomplete="off">
+        <p class="rail-note">The deal is created in HubSpot at Qualified when you send. You'll fill in the qualification details in HubSpot afterward.</p>
+        <button type="button" class="rail-link" id="cancelNew">Pick an existing deal instead</button>
+      </div>
+      <div class="rail-err" id="err-deal"></div>
     </div>
     <div class="divider"></div>
     <div class="stack">
-      <div>
-        <label>Prospect / client company<span class="req">*</span></label>
-        <input class="rail-in" id="company" placeholder="Company name" autocomplete="organization">
-        <div class="rail-err" id="err-company"></div>
-      </div>
-      <div>
-        <label>Your name<span class="req">*</span></label>
-        <input class="rail-in" id="yourName" autocomplete="name">
-        <div class="rail-err" id="err-yourName"></div>
-      </div>
-      <div>
-        <label>Your email<span class="req">*</span></label>
-        <input class="rail-in" id="yourEmail" type="email" placeholder="you@lushin.com" autocomplete="email">
-        <div class="rail-err" id="err-yourEmail"></div>
-      </div>
       <div>
         <label>Context / notes</label>
         <textarea class="rail-in" id="notes" rows="3" placeholder="Describe this deal for leadership"></textarea>
@@ -139,7 +206,8 @@ section{margin-bottom:40px;}
   <div class="scroll" id="scroll">
 
     <!-- FORM -->
-    <div class="form" id="form-wrap">
+    <div class="form locked" id="form-wrap">
+      <div class="lock-hint"><strong>Start with the deal.</strong> Find this deal in HubSpot under “HubSpot deal,” or create it, and the pricing form will open.</div>
       <div class="gen-err" id="gen-err">
         <div style="flex:none;margin-top:1px;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--passionate)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
@@ -165,6 +233,15 @@ section{margin-bottom:40px;}
             <div class="field"><label>Leadership coaching sessions / year</label><input id="coachingSessions" type="number" inputmode="numeric" min="0" max="24"><div class="err" id="err-coachingSessions"></div></div>
             <div class="field"><label>Travel hours / year</label><input id="travelHours" type="number" inputmode="numeric" min="0" max="80"><div class="err" id="err-travelHours"></div></div>
             <div class="field"><label>Travel rate ($/hr)</label><input id="travelRate" type="number" inputmode="numeric" min="0" step="50"><div class="helper">Dollars per travel hour.</div><div class="err" id="err-travelRate"></div></div>
+            <div class="field full" id="yoodli">
+              <label>Include Yoodli &amp; materials?</label>
+              <div class="choice">
+                <label><input type="radio" name="yoodli" value="true"> Yes</label>
+                <label><input type="radio" name="yoodli" value="false"> No</label>
+              </div>
+              <div class="helper">Optional add-on for each learner.</div>
+              <div class="err" id="err-yoodli"></div>
+            </div>
           </div>
         </section>
 
@@ -224,10 +301,22 @@ section{margin-bottom:40px;}
         </div>
         <h1>Check your email</h1>
         <p id="confirm-msg">Your summary is on its way.</p>
+        <div class="hs-remind" id="hsRemind" hidden></div>
         <button type="button" class="btn btn-secondary" id="reset">Start another request</button>
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- SIGN-IN GATE -->
+<div class="gate" id="gate">
+  <div class="inner">
+    <img src="assets/logos/lushin-logo-white.png" alt="Sandler | Lushin" style="height:44px;width:auto;">
+    <h1>Engagement pricing</h1>
+    <p>Sign in with your Lushin Microsoft account to price a deal.</p>
+    <div class="gate-err" id="gateErr"></div>
+    <a class="btn btn-primary" href="/api/auth/login">Sign in with Microsoft</a>
   </div>
 </div>
 
@@ -238,12 +327,191 @@ section{margin-bottom:40px;}
   var submitBtn = $('submit'), submitLabel = $('submit-label');
   var genErr = $('gen-err');
 
-  var REQUIRED = {
-    dealName: 'Enter a deal name.',
-    company: 'Enter the prospect or client company.',
-    yourName: 'Enter your name.',
-    yourEmail: 'Enter your email.'
-  };
+  // ---- Sign-in -----------------------------------------------------------
+  // The coach's name and email come from Microsoft 365; the server ignores
+  // anything the page claims about who is sending.
+  var me = null;
+
+  function showGate(msg){
+    if (msg){ $('gateErr').textContent = msg; $('gateErr').style.display = 'block'; }
+    $('gate').classList.add('show');
+  }
+
+  (function initSignIn(){
+    var params = new URLSearchParams(location.search);
+    var signinErr = params.get('signin_error');
+    if (signinErr) history.replaceState(null, '', location.pathname);
+    fetch('/api/me', { credentials: 'same-origin' }).then(function(r){
+      return r.json().catch(function(){ return {}; }).then(function(d){ return { status: r.status, d: d }; });
+    }).then(function(x){
+      if (x.status === 401 || !x.d.ok) return showGate(signinErr);
+      me = x.d;
+      $('who').innerHTML = 'Signed in as <strong>' + escapeHtml(me.user.name) + '</strong> · <a href="/api/auth/logout">Sign out</a>' +
+        (me.inHubSpot ? '' : '<br>Your email isn’t a HubSpot user, so deals you create won’t have an owner.');
+    }).catch(function(){ showGate('Could not check your sign-in. Refresh to try again.'); });
+  })();
+
+  // ---- HubSpot deal --------------------------------------------------------
+  // Either an existing open deal ({ mode:'existing', deal }) or a new one the
+  // server creates on send ({ mode:'new', company, pipeline, name }).
+  var PIPE_LABEL = { retainer: 'Retainer', seia: 'Assessments/SEIA' };
+  var choice = null;
+  var newDeal = { company: null, pipeline: null, nameEdited: false };
+
+  function debounce(fn, ms){ var t; return function(){ var a = arguments; clearTimeout(t); t = setTimeout(function(){ fn.apply(null, a); }, ms); }; }
+
+  function getJson(url){
+    return fetch(url, { credentials: 'same-origin' }).then(function(r){
+      if (r.status === 401){ showGate('Your sign-in has expired.'); throw new Error('signed out'); }
+      return r.json();
+    });
+  }
+
+  function dealMeta(d){
+    return [d.company && d.company.name, d.pipelineLabel + (d.stageLabel ? ' · ' + d.stageLabel : '')]
+      .filter(Boolean).map(escapeHtml).join(' — ');
+  }
+
+  function renderOptions(box, items, emptyMsg, onPick, extra){
+    box.innerHTML = '';
+    if (!items.length && emptyMsg){ var h = document.createElement('div'); h.className = 'hint'; h.textContent = emptyMsg; box.appendChild(h); }
+    items.forEach(function(it){
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'opt';
+      b.innerHTML = '<div class="n">' + escapeHtml(it.title) + '</div>' + (it.meta ? '<div class="m">' + it.meta + '</div>' : '');
+      b.addEventListener('mousedown', function(e){ e.preventDefault(); });
+      b.addEventListener('click', function(){ box.hidden = true; onPick(it.value); });
+      box.appendChild(b);
+    });
+    if (extra) box.appendChild(extra);
+    box.hidden = false;
+  }
+
+  var dealSeq = 0;
+  var searchDeals = debounce(function(q){
+    var seq = ++dealSeq, box = $('dealResults');
+    getJson('/api/deals?q=' + encodeURIComponent(q)).then(function(d){
+      if (seq !== dealSeq) return;
+      if (!d.ok) return renderOptions(box, [], d.error || 'Could not reach HubSpot.');
+      renderOptions(box, d.deals.map(function(x){ return { title: x.name, meta: dealMeta(x) + (x.mine ? '' : ' · not your deal'), value: x }; }),
+        q ? 'No open Retainer or Assessments/SEIA deals match “' + q + '”.' : 'You have no open deals in these pipelines. Search, or create the deal below.',
+        chooseExisting);
+    }).catch(function(){});
+  }, 250);
+
+  $('dealSearch').addEventListener('focus', function(){ searchDeals(raw('dealSearch')); });
+  $('dealSearch').addEventListener('input', function(){ clearDealError(); searchDeals(raw('dealSearch')); });
+  $('dealSearch').addEventListener('blur', function(){ setTimeout(function(){ $('dealResults').hidden = true; }, 150); });
+
+  function chooseExisting(d){
+    choice = { mode: 'existing', deal: d };
+    $('dcName').textContent = d.name;
+    $('dcMeta').innerHTML = dealMeta(d) + ' · <a href="' + d.url + '" target="_blank" rel="noopener" style="color:#fff;">Open in HubSpot</a>';
+    $('dealCard').hidden = false;
+    $('dealPicker').hidden = true;
+    $('newDeal').hidden = true;
+    clearDealError();
+    updateLock();
+  }
+
+  $('dcChange').addEventListener('click', function(){
+    choice = null;
+    $('dealCard').hidden = true;
+    $('dealPicker').hidden = false;
+    $('dealSearch').value = '';
+    updateLock();
+    $('dealSearch').focus();
+  });
+
+  $('newDealBtn').addEventListener('click', function(){
+    $('dealPicker').hidden = true;
+    $('newDeal').hidden = false;
+    syncNewDeal();
+    $('companySearch').focus();
+  });
+  $('cancelNew').addEventListener('click', function(){
+    choice = null;
+    $('newDeal').hidden = true;
+    $('dealPicker').hidden = false;
+    clearDealError();
+    updateLock();
+  });
+
+  var companySeq = 0;
+  var searchCompanies = debounce(function(q){
+    var seq = ++companySeq, box = $('companyResults');
+    if (!q){ box.hidden = true; return; }
+    var addNew = document.createElement('button');
+    addNew.type = 'button'; addNew.className = 'opt';
+    addNew.innerHTML = '<div class="n">+ Add “' + escapeHtml(q) + '” as a new company</div>';
+    addNew.addEventListener('mousedown', function(e){ e.preventDefault(); });
+    addNew.addEventListener('click', function(){ box.hidden = true; pickCompany({ id: null, name: q }); });
+    getJson('/api/companies?q=' + encodeURIComponent(q)).then(function(d){
+      if (seq !== companySeq) return;
+      var list = (d.ok ? d.companies : []).map(function(c){ return { title: c.name, meta: c.domain ? escapeHtml(c.domain) : '', value: c }; });
+      renderOptions(box, list, null, pickCompany, addNew);
+    }).catch(function(){});
+  }, 250);
+
+  $('companySearch').addEventListener('input', function(){
+    newDeal.company = null; $('dupes').hidden = true; clearDealError(); syncNewDeal();
+    searchCompanies(raw('companySearch'));
+  });
+  $('companySearch').addEventListener('blur', function(){ setTimeout(function(){ $('companyResults').hidden = true; }, 150); });
+
+  // Picking a company also checks for its open deals, so coaches don't create a duplicate.
+  function pickCompany(c){
+    newDeal.company = c;
+    $('companySearch').value = c.name;
+    $('dupes').hidden = true;
+    if (c.id){
+      getJson('/api/deals?companyId=' + encodeURIComponent(c.id)).then(function(d){
+        if (!d.ok || !d.deals.length || newDeal.company !== c) return;
+        var box = $('dupes');
+        box.innerHTML = '<strong>' + escapeHtml(c.name) + ' already has open deals.</strong> Use one of these instead of creating another?';
+        d.deals.forEach(function(x){
+          var b = document.createElement('button');
+          b.type = 'button'; b.className = 'rail-link';
+          b.textContent = x.name + ' (' + x.pipelineLabel + ' · ' + x.stageLabel + ')';
+          b.addEventListener('click', function(){ chooseExisting(x); });
+          box.appendChild(b);
+        });
+        box.hidden = false;
+      }).catch(function(){});
+    }
+    syncNewDeal();
+  }
+
+  document.querySelectorAll('#pipelineSeg button').forEach(function(b){
+    b.addEventListener('click', function(){ newDeal.pipeline = b.getAttribute('data-p'); clearDealError(); syncNewDeal(); });
+  });
+  $('newDealName').addEventListener('input', function(){ newDeal.nameEdited = true; clearDealError(); syncNewDeal(); });
+
+  // Suggests "Company – Pipeline" until the coach types their own name.
+  function syncNewDeal(){
+    document.querySelectorAll('#pipelineSeg button').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-p') === newDeal.pipeline); });
+    if (!newDeal.nameEdited){
+      var co = newDeal.company ? newDeal.company.name : raw('companySearch');
+      $('newDealName').value = co && newDeal.pipeline ? co + ' – ' + PIPE_LABEL[newDeal.pipeline] : '';
+    }
+    var ready = newDeal.company && newDeal.pipeline && raw('newDealName');
+    choice = ready ? { mode: 'new', company: newDeal.company, pipeline: newDeal.pipeline, name: raw('newDealName') } : null;
+    updateLock();
+  }
+
+  function updateLock(){ $('form-wrap').classList.toggle('locked', !choice); }
+
+  function clearDealError(){ $('err-deal').style.display = 'none'; $('err-deal').textContent = ''; }
+
+  function dealError(){
+    var msg;
+    if (!$('newDeal').hidden){
+      if (!newDeal.company) msg = raw('companySearch') ? 'Pick the company from the list, or add it as new.' : 'Enter the prospect or client company.';
+      else if (!newDeal.pipeline) msg = 'Choose a pipeline.';
+      else if (!raw('newDealName')) msg = 'Enter a deal name.';
+    } else if (!choice) msg = 'Choose a HubSpot deal, or create one.';
+    return msg || null;
+  }
 
   // Number rules. Blank is never filled in for the coach: a required field must be
   // typed in (0 is an answer). The same rules are enforced again on the server.
@@ -276,7 +544,7 @@ section{margin-bottom:40px;}
     if (input) input.classList.remove('invalid');
     if (err){ err.style.display = 'none'; err.textContent = ''; }
   }
-  Object.keys(REQUIRED).concat(NUM.map(function(r){ return r.id; })).forEach(function(id){
+  NUM.map(function(r){ return r.id; }).forEach(function(id){
     var el = $(id); if (el) el.addEventListener('input', function(){ clearFieldError(id); genErr.classList.remove('show'); });
   });
 
@@ -289,12 +557,14 @@ section{margin-bottom:40px;}
   function validate(){
     var firstBad = null;
     function bad(id, msg){ showFieldError(id, msg); firstBad = firstBad || id; }
-    Object.keys(REQUIRED).forEach(clearFieldError);
     NUM.forEach(function(r){ clearFieldError(r.id); });
 
-    Object.keys(REQUIRED).forEach(function(id){ if (!raw(id)) bad(id, REQUIRED[id]); });
-    var email = raw('yourEmail');
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) bad('yourEmail', 'Enter a valid email address.');
+    var dErr = dealError();
+    if (dErr){
+      $('err-deal').textContent = dErr; $('err-deal').style.display = 'block';
+      updateLock();
+      return false;
+    }
 
     NUM.forEach(function(r){
       var v = raw(r.id);
@@ -310,6 +580,7 @@ section{margin-bottom:40px;}
     });
     if (raw('aorLed') !== '' && num('aorLed') > num('teamSessions') && !$('aorLed').classList.contains('invalid'))
       bad('aorLed', 'Can’t exceed team sessions.');
+    if (!yoodliChoice()) bad('yoodli', 'Choose Yes or No.');
 
     if (firstBad){
       var el = $(firstBad);
@@ -322,16 +593,20 @@ section{margin-bottom:40px;}
   // Sends exactly what was typed, blanks included. The server re-checks everything.
   function val(id){ return raw(id); }
 
+  function yoodliChoice(){ var r = document.querySelector('input[name="yoodli"]:checked'); return r ? r.value : ''; }
+  document.querySelectorAll('input[name="yoodli"]').forEach(function(r){
+    r.addEventListener('change', function(){ $('err-yoodli').style.display = 'none'; genErr.classList.remove('show'); });
+  });
+
   function payload(){
     return {
       meta: {
-        dealName: val('dealName'),
-        coachName: val('yourName'),
-        coachEmail: val('yourEmail'),
-        clientName: val('company'),
         notes: val('notes'),
         submittedAt: new Date().toISOString()
       },
+      deal: choice.mode === 'existing'
+        ? { id: choice.deal.id }
+        : { create: { pipeline: choice.pipeline, name: choice.name, companyId: choice.company.id, companyName: choice.company.name } },
       engagement: {
         learners: val('learners'),
         teamSessions: val('teamSessions'),
@@ -341,7 +616,8 @@ section{margin-bottom:40px;}
         trainerYears: val('trainerExp'),
         aorYears: val('aorExp'),
         travelHours: val('travelHours'),
-        travelRate: val('travelRate')
+        travelRate: val('travelRate'),
+        includeYoodli: yoodliChoice()
       },
       prospect: {
         revenue: val('annualRevenue'),
@@ -372,9 +648,14 @@ section{margin-bottom:40px;}
         body: JSON.stringify(payload())
       });
       var data = await res.json().catch(function(){ return {}; });
+      // If the deal was created but the email failed, retry against that deal
+      // instead of creating a second one.
+      if (data.deal && data.deal.id && choice && choice.mode === 'new') chooseExisting(data.deal);
+      if (res.status === 401) showGate(data.error);
       if (!res.ok || !data.ok){ var err = new Error(data.error || 'send failed'); err.server = data.error; throw err; }
-      $('confirm-msg').innerHTML = 'Your summary for <strong>' + escapeHtml(val('dealName')) +
-        '</strong> is on its way to <strong>' + escapeHtml(val('yourEmail')) + '</strong>.';
+      $('confirm-msg').innerHTML = 'Your summary for <strong>' + escapeHtml(data.deal.name) +
+        '</strong> is on its way to <strong>' + escapeHtml(me.user.email) + '</strong>.';
+      showHubSpotReminder(data);
       $('form-wrap').style.display = 'none';
       $('confirm').classList.add('show');
       scroll.scrollTo({ top: 0 });
@@ -388,15 +669,42 @@ section{margin-bottom:40px;}
     }
   });
 
+  // Reminds the coach to finish the deal in HubSpot (leadership's email says the same).
+  function showHubSpotReminder(data){
+    var box = $('hsRemind'), d = data.deal, lines = [];
+    var link = '<a href="' + d.url + '" target="_blank" rel="noopener">Open the deal in HubSpot →</a>';
+    if (d.created) lines.push('<strong>Your deal was created in HubSpot.</strong> “' + escapeHtml(d.name) + '” is in the ' +
+      escapeHtml(d.pipelineLabel) + ' pipeline at ' + escapeHtml(d.stageLabel || 'Qualified') + '.');
+    if (data.preQualified) lines.push('<strong>This deal is still in ' + escapeHtml(d.stageLabel) + ',</strong> not Qualified.');
+    if (data.missing && data.missing.length) lines.push('Please fill in the rest of the qualification details in HubSpot. Still blank: ' +
+      data.missing.map(escapeHtml).join(', ') + '.');
+    if (!data.filed) lines.push('<strong>The report couldn’t be attached to the deal.</strong> Please add the PDF from your email to the deal in HubSpot.');
+    if (lines.length){
+      box.className = 'hs-remind';
+      box.innerHTML = lines.map(function(l){ return '<p>' + l + '</p>'; }).join('') + '<p style="margin:0;">' + link + '</p>';
+    } else {
+      box.className = 'hs-filed';
+      box.innerHTML = 'Filed on the deal in HubSpot. ' + link;
+    }
+    box.hidden = false;
+  }
+
   $('reset').addEventListener('click', function(){
-    document.querySelectorAll('.rail-in, .field input').forEach(function(el){ el.value = ''; el.classList.remove('invalid'); });
+    document.querySelectorAll('.rail-in, .field input:not([type=radio])').forEach(function(el){ el.value = ''; el.classList.remove('invalid'); });
+    document.querySelectorAll('input[name="yoodli"]').forEach(function(r){ r.checked = false; });
     document.querySelectorAll('.rail-err, .err').forEach(function(el){ el.style.display = 'none'; });
     genErr.classList.remove('show');
     $('confirm').classList.remove('show');
+    $('hsRemind').hidden = true;
     $('form-wrap').style.display = '';
+    choice = null;
+    newDeal = { company: null, pipeline: null, nameEdited: false };
+    $('dealCard').hidden = true; $('newDeal').hidden = true; $('dupes').hidden = true;
+    $('dealPicker').hidden = false;
+    updateLock();
     setBusy(false);
     scroll.scrollTo({ top: 0 });
-    $('dealName').focus();
+    $('dealSearch').focus();
   });
 
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
