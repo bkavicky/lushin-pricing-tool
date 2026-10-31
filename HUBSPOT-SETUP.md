@@ -17,20 +17,25 @@ Three things to create, then paste into Vercel:
 
 ---
 
-## Part 1 — HubSpot private app (a HubSpot super admin does this)
+## Part 1 — HubSpot legacy app (a HubSpot super admin does this)
 
-1. HubSpot → **Settings** (gear) → **Integrations → Private Apps** (newer
-   accounts may label this **Legacy Apps**). Click **Create a private app**.
+1. HubSpot → **Settings** (gear) → **Integrations → Legacy Apps**. Create a
+   **private** legacy app (not a public one).
 2. Name it **Lushin Pricing Tool**.
-3. On the **Scopes** tab, turn on:
+3. On the **Scopes** tab, turn on exactly these and nothing else:
    - `crm.objects.deals.read` and `crm.objects.deals.write`
    - `crm.objects.companies.read` and `crm.objects.companies.write`
    - `crm.objects.owners.read`
    - `crm.objects.contacts.write` (HubSpot uses this for creating notes)
    - `crm.schemas.deals.read` (to read pipeline stage names)
-   - `files`
+   - `files` — the one described as uploading to and managing the File
+     Manager. Leave the other file options (such as `files.ui_hidden.read`)
+     off; the tool only uploads the PDF.
 4. **Create app**, then copy the **access token** (starts with `pat-`). That's
    `HUBSPOT_TOKEN`.
+
+The PDFs land in a **Pricing Reports** folder in the File Manager, marked
+private, so they aren't public links.
 
 Notes and files created by the tool show as coming from the **Lushin Pricing
 Tool** app. Each note is owned by the coach who ran the pricing.
